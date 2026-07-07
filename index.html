@@ -9,17 +9,33 @@
   <meta property="og:title" content="Smart Bharat – AI Civic Companion" />
   <meta property="og:description" content="Your AI-powered gateway to every government service in India." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://jinethb2006.github.io/smart-bharat/" />
+
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             script-src 'self' https://unpkg.com 'unsafe-inline';
+             style-src 'self' https://fonts.googleapis.com https://unpkg.com 'unsafe-inline';
+             font-src https://fonts.gstatic.com;
+             img-src 'self' data: https://*.tile.openstreetmap.org;
+             connect-src 'self' https://generativelanguage.googleapis.com;
+             frame-ancestors 'none';" />
+
+  <!-- Security headers via meta -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
 
   <!-- Leaflet Map -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Icons (Lucide via CDN) -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WPcU=" crossorigin="anonymous"></script>
 
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+<!-- Skip to main content (Accessibility) -->
+<a href="#main-content" class="skip-link" id="skip-link">Skip to main content</a>
 
 <div id="app">
   <!-- ─────────────── TOPBAR ─────────────── -->
@@ -36,7 +52,7 @@
 
     <div id="topbar-search" role="search">
       <span class="search-icon" aria-hidden="true">🔍</span>
-      <input id="global-search" type="search" placeholder="Search services, schemes, documents..." aria-label="Search government services" autocomplete="off" />
+      <input id="global-search" type="search" placeholder="Search services, schemes, documents..." aria-label="Search government services" autocomplete="off" maxlength="200" />
     </div>
 
     <div class="topbar-actions">
@@ -58,63 +74,63 @@
     <span class="nav-section-label" data-i18n="nav_main">Main</span>
 
     <button class="nav-item active" id="nav-home" data-section="home" aria-current="page">
-      <span class="nav-icon">🏠</span>
+      <span class="nav-icon" aria-hidden="true">🏠</span>
       <span data-i18n="nav_home">Dashboard</span>
     </button>
 
     <button class="nav-item" id="nav-chat" data-section="chat">
-      <span class="nav-icon">🤖</span>
+      <span class="nav-icon" aria-hidden="true">🤖</span>
       <span data-i18n="nav_chat">Seva Sathi AI</span>
-      <span class="nav-badge">AI</span>
+      <span class="nav-badge" aria-label="AI powered">AI</span>
     </button>
 
-    <div class="sidebar-divider"></div>
+    <div class="sidebar-divider" role="separator"></div>
     <span class="nav-section-label" data-i18n="nav_services">Services</span>
 
     <button class="nav-item" id="nav-schemes" data-section="schemes">
-      <span class="nav-icon">📋</span>
+      <span class="nav-icon" aria-hidden="true">📋</span>
       <span data-i18n="nav_schemes">Yojana Finder</span>
     </button>
 
     <button class="nav-item" id="nav-report" data-section="report">
-      <span class="nav-icon">📍</span>
+      <span class="nav-icon" aria-hidden="true">📍</span>
       <span data-i18n="nav_report">Report Issue</span>
     </button>
 
     <button class="nav-item" id="nav-tracker" data-section="tracker">
-      <span class="nav-icon">📊</span>
+      <span class="nav-icon" aria-hidden="true">📊</span>
       <span data-i18n="nav_tracker">Track Complaints</span>
     </button>
 
     <button class="nav-item" id="nav-docs" data-section="docs">
-      <span class="nav-icon">📄</span>
+      <span class="nav-icon" aria-hidden="true">📄</span>
       <span data-i18n="nav_docs">Document Guide</span>
     </button>
 
-    <div class="sidebar-divider"></div>
+    <div class="sidebar-divider" role="separator"></div>
     <span class="nav-section-label" data-i18n="nav_access">Accessibility</span>
 
     <div class="a11y-bar" role="region" aria-label="Accessibility controls">
-      <label data-i18n="a11y_font">Font:</label>
-      <div class="font-scale-btns">
+      <label data-i18n="a11y_font" id="font-label">Font:</label>
+      <div class="font-scale-btns" role="group" aria-labelledby="font-label">
         <button id="font-down" aria-label="Decrease font size" title="Decrease font">A−</button>
         <button id="font-reset" aria-label="Reset font size" title="Reset font">A</button>
         <button id="font-up" aria-label="Increase font size" title="Increase font">A+</button>
       </div>
     </div>
 
-    <div class="sidebar-footer">
+    <div class="sidebar-footer" role="contentinfo">
       <p>Powered by <strong>Gemini AI</strong><br/>Digital India Initiative 🇮🇳</p>
     </div>
   </nav>
 
   <!-- ─────────────── MAIN CONTENT ─────────────── -->
-  <main id="main-content" role="main">
+  <main id="main-content" role="main" tabindex="-1">
 
     <!-- ═══════════════════════ HOME / DASHBOARD ═══════════════════════ -->
     <section id="home" class="page-section active" aria-labelledby="home-title">
 
-      <div class="hero-banner" role="img" aria-label="Smart Bharat hero section">
+      <div class="hero-banner" role="region" aria-label="Smart Bharat welcome banner">
         <h1 id="home-title" data-i18n="hero_title">Namaste! 🙏 Welcome to Smart Bharat</h1>
         <p data-i18n="hero_sub">Your AI-powered gateway to every government service in India. Ask Seva Sathi, find yojanas, report civic issues — all in one place.</p>
         <div class="hero-actions">
@@ -129,21 +145,21 @@
         <div class="stat-card">
           <div class="stat-icon saffron" aria-hidden="true">🏛️</div>
           <div>
-            <div class="stat-value" id="stat-schemes">480+</div>
+            <div class="stat-value" id="stat-schemes" aria-label="480 plus government schemes">480+</div>
             <div class="stat-label" data-i18n="stat_schemes">Govt. Schemes</div>
           </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon green" aria-hidden="true">👥</div>
           <div>
-            <div class="stat-value" id="stat-citizens">2.3L</div>
+            <div class="stat-value" id="stat-citizens" aria-label="2.3 lakh citizens helped">2.3L</div>
             <div class="stat-label" data-i18n="stat_citizens">Citizens Helped</div>
           </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon indigo" aria-hidden="true">📝</div>
           <div>
-            <div class="stat-value" id="stat-issues" data-dynamic="issues">0</div>
+            <div class="stat-value" id="stat-issues" data-dynamic="issues" aria-live="polite">0</div>
             <div class="stat-label" data-i18n="stat_issues">Issues Reported</div>
           </div>
         </div>
@@ -158,38 +174,38 @@
 
       <!-- Quick Actions -->
       <div class="card" role="region" aria-labelledby="quick-actions-heading">
-        <h2 class="card-title" id="quick-actions-heading"><span class="card-title-icon">⚡</span> <span data-i18n="quick_actions">Quick Actions</span></h2>
-        <div class="quick-actions">
-          <button class="quick-action-btn" data-nav="chat" data-query="How to apply for Aadhaar card?" aria-label="Aadhaar help">
-            <div class="quick-action-icon">🪪</div>
+        <h2 class="card-title" id="quick-actions-heading"><span class="card-title-icon" aria-hidden="true">⚡</span> <span data-i18n="quick_actions">Quick Actions</span></h2>
+        <div class="quick-actions" role="list">
+          <button class="quick-action-btn" role="listitem" data-nav="chat" data-query="How to apply for Aadhaar card?" aria-label="Get Aadhaar help from Seva Sathi">
+            <div class="quick-action-icon" aria-hidden="true">🪪</div>
             <span data-i18n="qa_aadhaar">Aadhaar Help</span>
           </button>
-          <button class="quick-action-btn" data-nav="chat" data-query="How to apply for a passport in India?" aria-label="Passport help">
-            <div class="quick-action-icon">🛂</div>
+          <button class="quick-action-btn" role="listitem" data-nav="chat" data-query="How to apply for a passport in India?" aria-label="Get passport help">
+            <div class="quick-action-icon" aria-hidden="true">🛂</div>
             <span data-i18n="qa_passport">Passport</span>
           </button>
-          <button class="quick-action-btn" data-nav="chat" data-query="Tell me about PM-KISAN scheme eligibility." aria-label="PM-KISAN scheme">
-            <div class="quick-action-icon">🌾</div>
+          <button class="quick-action-btn" role="listitem" data-nav="chat" data-query="Tell me about PM-KISAN scheme eligibility." aria-label="Learn about PM-KISAN scheme">
+            <div class="quick-action-icon" aria-hidden="true">🌾</div>
             <span data-i18n="qa_kisan">PM-KISAN</span>
           </button>
-          <button class="quick-action-btn" data-nav="chat" data-query="How do I get a ration card?" aria-label="Ration card help">
-            <div class="quick-action-icon">🛒</div>
+          <button class="quick-action-btn" role="listitem" data-nav="chat" data-query="How do I get a ration card?" aria-label="Get ration card help">
+            <div class="quick-action-icon" aria-hidden="true">🛒</div>
             <span data-i18n="qa_ration">Ration Card</span>
           </button>
-          <button class="quick-action-btn" data-nav="report" aria-label="Report pothole">
-            <div class="quick-action-icon" style="background:linear-gradient(135deg,var(--saffron),hsl(20,96%,50%))">🚧</div>
+          <button class="quick-action-btn" role="listitem" data-nav="report" aria-label="Report a pothole">
+            <div class="quick-action-icon" style="background:linear-gradient(135deg,var(--saffron),hsl(20,96%,50%))" aria-hidden="true">🚧</div>
             <span data-i18n="qa_pothole">Report Pothole</span>
           </button>
-          <button class="quick-action-btn" data-nav="schemes" aria-label="Find scholarships">
-            <div class="quick-action-icon" style="background:linear-gradient(135deg,var(--india-green),var(--green-light))">🎓</div>
+          <button class="quick-action-btn" role="listitem" data-nav="schemes" aria-label="Find scholarship schemes">
+            <div class="quick-action-icon" style="background:linear-gradient(135deg,var(--india-green),var(--green-light))" aria-hidden="true">🎓</div>
             <span data-i18n="qa_scholarship">Scholarships</span>
           </button>
-          <button class="quick-action-btn" data-nav="chat" data-query="What benefits can senior citizens get from the government?" aria-label="Senior citizen benefits">
-            <div class="quick-action-icon" style="background:linear-gradient(135deg,hsl(260,72%,56%),hsl(280,72%,60%))">👴</div>
+          <button class="quick-action-btn" role="listitem" data-nav="chat" data-query="What benefits can senior citizens get from the government?" aria-label="Learn about senior citizen benefits">
+            <div class="quick-action-icon" style="background:linear-gradient(135deg,hsl(260,72%,56%),hsl(280,72%,60%))" aria-hidden="true">👴</div>
             <span data-i18n="qa_senior">Senior Benefits</span>
           </button>
-          <button class="quick-action-btn" data-nav="docs" aria-label="Document guide">
-            <div class="quick-action-icon" style="background:linear-gradient(135deg,hsl(210,78%,45%),hsl(220,78%,55%))">📄</div>
+          <button class="quick-action-btn" role="listitem" data-nav="docs" aria-label="Open document checklist guide">
+            <div class="quick-action-icon" style="background:linear-gradient(135deg,hsl(210,78%,45%),hsl(220,78%,55%))" aria-hidden="true">📄</div>
             <span data-i18n="qa_docs">Doc Checklist</span>
           </button>
         </div>
@@ -198,45 +214,45 @@
       <!-- Recent news -->
       <div class="two-col">
         <div class="card" role="region" aria-labelledby="news-heading">
-          <h2 class="card-title" id="news-heading"><span class="card-title-icon">📰</span> <span data-i18n="latest_news">Latest Updates</span></h2>
-          <div style="display:flex;flex-direction:column;gap:12px;" id="news-list">
-            <div style="display:flex;gap:10px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--glass-border)">
-              <span style="font-size:1.3rem;">🏥</span>
+          <h2 class="card-title" id="news-heading"><span class="card-title-icon" aria-hidden="true">📰</span> <span data-i18n="latest_news">Latest Updates</span></h2>
+          <div style="display:flex;flex-direction:column;gap:12px;" id="news-list" role="list">
+            <article style="display:flex;gap:10px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--glass-border)" role="listitem">
+              <span style="font-size:1.3rem;" aria-hidden="true">🏥</span>
               <div>
                 <p style="font-size:0.86rem;font-weight:600;" data-i18n="news_1_title">Ayushman Bharat extended to 70+ citizens</p>
                 <p style="font-size:0.75rem;color:var(--text-muted);" data-i18n="news_1_date">July 2026 • Health</p>
               </div>
-              <span class="badge badge-new ml-auto">NEW</span>
-            </div>
-            <div style="display:flex;gap:10px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--glass-border)">
-              <span style="font-size:1.3rem;">🌾</span>
+              <span class="badge badge-new ml-auto" aria-label="New update">NEW</span>
+            </article>
+            <article style="display:flex;gap:10px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid var(--glass-border)" role="listitem">
+              <span style="font-size:1.3rem;" aria-hidden="true">🌾</span>
               <div>
                 <p style="font-size:0.86rem;font-weight:600;" data-i18n="news_2_title">PM-KISAN 18th installment released</p>
                 <p style="font-size:0.75rem;color:var(--text-muted);" data-i18n="news_2_date">June 2026 • Agriculture</p>
               </div>
-              <span class="badge badge-live">LIVE</span>
-            </div>
-            <div style="display:flex;gap:10px;align-items:flex-start">
-              <span style="font-size:1.3rem;">🎓</span>
+              <span class="badge badge-live" aria-label="Live update">LIVE</span>
+            </article>
+            <article style="display:flex;gap:10px;align-items:flex-start" role="listitem">
+              <span style="font-size:1.3rem;" aria-hidden="true">🎓</span>
               <div>
                 <p style="font-size:0.86rem;font-weight:600;" data-i18n="news_3_title">National Scholarship Portal 2026 opens</p>
                 <p style="font-size:0.75rem;color:var(--text-muted);" data-i18n="news_3_date">July 2026 • Education</p>
               </div>
-              <span class="badge badge-info">INFO</span>
-            </div>
+              <span class="badge badge-info" aria-label="Informational">INFO</span>
+            </article>
           </div>
         </div>
 
         <div class="card" role="region" aria-labelledby="languages-heading">
-          <h2 class="card-title" id="languages-heading"><span class="card-title-icon">🌐</span> <span data-i18n="multilingual">Multilingual Support</span></h2>
+          <h2 class="card-title" id="languages-heading"><span class="card-title-icon" aria-hidden="true">🌐</span> <span data-i18n="multilingual">Multilingual Support</span></h2>
           <p style="font-size:0.84rem;color:var(--text-secondary);margin-bottom:16px;" data-i18n="multilingual_desc">Seva Sathi speaks your language. Select from the language menu above or ask in any Indian language.</p>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)">🇮🇳 हिंदी</div>
-            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)">தமிழ்</div>
-            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)">తెలుగు</div>
-            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)">বাংলা</div>
-            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)">मराठी</div>
-            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)">+18 more</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" role="list" aria-label="Supported languages">
+            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)" role="listitem" lang="hi">🇮🇳 हिंदी</div>
+            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)" role="listitem" lang="ta">தமிழ்</div>
+            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)" role="listitem" lang="te">తెలుగు</div>
+            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)" role="listitem" lang="bn">বাংলা</div>
+            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)" role="listitem" lang="mr">मराठी</div>
+            <div style="padding:10px;background:var(--surface-alt);border-radius:var(--radius);text-align:center;font-size:0.8rem;border:1px solid var(--glass-border)" role="listitem">+18 more</div>
           </div>
         </div>
       </div>
@@ -251,42 +267,42 @@
       </div>
 
       <div class="chat-container" role="region" aria-label="Chat with Seva Sathi">
-        <div class="chat-header">
+        <div class="chat-header" role="banner">
           <div class="chat-avatar" aria-hidden="true">🤖</div>
           <div class="chat-header-info">
-            <h3 data-i18n="bot_name">Seva Sathi</h3>
+            <h2 data-i18n="bot_name">Seva Sathi</h2>
             <p data-i18n="bot_tagline">AI Civic Companion • Digital India</p>
           </div>
-          <div class="chat-status-dot" aria-label="Online" title="Seva Sathi is online"></div>
+          <div class="chat-status-dot" aria-label="Seva Sathi is online" title="Online" role="status"></div>
           <div style="margin-left:8px;display:flex;gap:8px;">
             <button class="icon-btn" id="clear-chat" title="Clear chat" aria-label="Clear chat history" style="color:white;border-color:rgba(255,255,255,0.2)">🗑️</button>
-            <button class="icon-btn" id="tts-toggle" title="Text-to-Speech" aria-label="Toggle text-to-speech" style="color:white;border-color:rgba(255,255,255,0.2)">🔊</button>
+            <button class="icon-btn" id="tts-toggle" title="Toggle Text-to-Speech" aria-label="Toggle text-to-speech" aria-pressed="false" style="color:white;border-color:rgba(255,255,255,0.2)">🔊</button>
           </div>
         </div>
 
         <!-- API Key panel -->
         <div class="api-key-panel" role="region" aria-label="Gemini API configuration">
-          <label for="gemini-api-key">🔑 <span data-i18n="api_key_label">Gemini API Key (optional for live AI):</span></label>
-          <input type="password" id="gemini-api-key" placeholder="AIza..." autocomplete="off" aria-label="Enter Gemini API key" />
-          <button class="btn btn-sm btn-outline" id="save-api-key" aria-label="Save API key">💾 <span data-i18n="save">Save</span></button>
-          <span id="api-key-status" style="font-size:0.72rem;color:var(--text-muted);"></span>
+          <label for="gemini-api-key" id="api-key-label">🔑 <span data-i18n="api_key_label">Gemini API Key (optional for live AI):</span></label>
+          <input type="password" id="gemini-api-key" placeholder="AIza..." autocomplete="off" aria-labelledby="api-key-label" aria-describedby="api-key-status" maxlength="60" />
+          <button class="btn btn-sm btn-outline" id="save-api-key" aria-label="Save Gemini API key">💾 <span data-i18n="save">Save</span></button>
+          <span id="api-key-status" role="status" aria-live="polite" style="font-size:0.72rem;color:var(--text-muted);"></span>
         </div>
 
-        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Chat messages">
+        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-atomic="false" aria-label="Chat messages" aria-relevant="additions">
           <!-- Messages injected by JS -->
         </div>
 
-        <div class="chat-suggestions" id="chat-suggestions" role="region" aria-label="Quick questions">
-          <button class="suggestion-chip" data-i18n-query="sug_1">How to apply for Aadhaar?</button>
-          <button class="suggestion-chip" data-i18n-query="sug_2">PM-KISAN eligibility</button>
-          <button class="suggestion-chip" data-i18n-query="sug_3">Passport documents needed</button>
-          <button class="suggestion-chip" data-i18n-query="sug_4">Senior citizen pension scheme</button>
-          <button class="suggestion-chip" data-i18n-query="sug_5">Beti Bachao Beti Padhao</button>
+        <div class="chat-suggestions" id="chat-suggestions" role="region" aria-label="Quick question suggestions">
+          <button class="suggestion-chip" data-i18n-query="sug_1" aria-label="Ask: How to apply for Aadhaar?">How to apply for Aadhaar?</button>
+          <button class="suggestion-chip" data-i18n-query="sug_2" aria-label="Ask about PM-KISAN eligibility">PM-KISAN eligibility</button>
+          <button class="suggestion-chip" data-i18n-query="sug_3" aria-label="Ask about passport documents">Passport documents needed</button>
+          <button class="suggestion-chip" data-i18n-query="sug_4" aria-label="Ask about senior citizen pension">Senior citizen pension scheme</button>
+          <button class="suggestion-chip" data-i18n-query="sug_5" aria-label="Ask about Beti Bachao Beti Padhao">Beti Bachao Beti Padhao</button>
         </div>
 
         <div class="chat-input-area">
-          <button class="voice-btn" id="voice-btn" title="Voice input" aria-label="Start voice input">🎤</button>
-          <textarea id="chat-input" placeholder="Type your question in any language... (Ctrl+Enter to send)" rows="1" aria-label="Chat message input"></textarea>
+          <button class="voice-btn" id="voice-btn" title="Voice input" aria-label="Start voice input" aria-pressed="false">🎤</button>
+          <textarea id="chat-input" placeholder="Type your question in any language... (Enter to send)" rows="1" aria-label="Type your message to Seva Sathi" aria-multiline="true" maxlength="1000"></textarea>
           <button class="chat-send-btn" id="chat-send" aria-label="Send message">➤</button>
         </div>
       </div>
@@ -300,11 +316,11 @@
       </div>
 
       <div class="card">
-        <h2 class="card-title"><span class="card-title-icon">🔎</span> <span data-i18n="filter_title">Filter Schemes for You</span></h2>
-        <div class="filter-grid">
+        <h2 class="card-title"><span class="card-title-icon" aria-hidden="true">🔎</span> <span data-i18n="filter_title">Filter Schemes for You</span></h2>
+        <div class="filter-grid" role="form" aria-label="Scheme filter form">
           <div class="filter-group">
             <label for="filter-category" data-i18n="filter_category">Category</label>
-            <select id="filter-category" aria-label="Select category">
+            <select id="filter-category" aria-label="Select beneficiary category">
               <option value="all" data-i18n="filter_all">All Categories</option>
               <option value="farmer">🌾 Farmer / Agriculture</option>
               <option value="student">🎓 Student / Education</option>
@@ -317,7 +333,7 @@
           </div>
           <div class="filter-group">
             <label for="filter-state" data-i18n="filter_state">State</label>
-            <select id="filter-state" aria-label="Select state">
+            <select id="filter-state" aria-label="Select your state">
               <option value="all">All States / UTs</option>
               <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option>
               <option>Delhi</option><option>Gujarat</option><option>Haryana</option>
@@ -332,13 +348,13 @@
             <select id="filter-income" aria-label="Select income group">
               <option value="all">All Income Groups</option>
               <option value="bpl">Below Poverty Line (BPL)</option>
-              <option value="low">Low Income (< ₹2.5L)</option>
+              <option value="low">Low Income (below ₹2.5L)</option>
               <option value="mid">Middle Income (₹2.5L–₹8L)</option>
               <option value="above">Above ₹8L</option>
             </select>
           </div>
           <div class="filter-group" style="align-self:flex-end;">
-            <button class="btn btn-primary" id="find-schemes-btn" style="width:100%;" aria-label="Find matching schemes">🔍 <span data-i18n="btn_find">Find Schemes</span></button>
+            <button class="btn btn-primary" id="find-schemes-btn" style="width:100%;" aria-label="Find matching government schemes">🔍 <span data-i18n="btn_find">Find Schemes</span></button>
           </div>
         </div>
       </div>
@@ -358,11 +374,11 @@
       <div class="report-grid">
         <div style="display:flex;flex-direction:column;gap:16px;">
           <div class="card">
-            <h2 class="card-title"><span class="card-title-icon">📝</span> <span data-i18n="issue_details">Issue Details</span></h2>
-            <div style="display:flex;flex-direction:column;gap:14px;">
+            <h2 class="card-title"><span class="card-title-icon" aria-hidden="true">📝</span> <span data-i18n="issue_details">Issue Details</span></h2>
+            <form id="issue-form" novalidate style="display:flex;flex-direction:column;gap:14px;" aria-label="Civic issue report form">
               <div class="form-group">
-                <label for="issue-type" data-i18n="issue_type">Issue Type *</label>
-                <select id="issue-type" required aria-label="Select issue type">
+                <label for="issue-type" data-i18n="issue_type">Issue Type <abbr title="Required">*</abbr></label>
+                <select id="issue-type" required aria-required="true" aria-label="Select issue type" aria-describedby="issue-type-error">
                   <option value="" data-i18n="select_issue">— Select Issue Type —</option>
                   <option value="pothole">🚧 Pothole / Road Damage</option>
                   <option value="garbage">🗑️ Garbage / Waste Dumping</option>
@@ -372,56 +388,60 @@
                   <option value="encroach">🏗️ Illegal Encroachment</option>
                   <option value="other">📌 Other</option>
                 </select>
+                <span id="issue-type-error" class="field-error" role="alert" aria-live="assertive"></span>
               </div>
               <div class="form-group">
-                <label for="issue-title" data-i18n="issue_title_label">Issue Title *</label>
-                <input type="text" id="issue-title" placeholder="Brief description of the issue..." required aria-label="Issue title" />
+                <label for="issue-title" data-i18n="issue_title_label">Issue Title <abbr title="Required">*</abbr></label>
+                <input type="text" id="issue-title" placeholder="Brief description of the issue..." required aria-required="true" aria-describedby="issue-title-error" maxlength="120" />
+                <span id="issue-title-error" class="field-error" role="alert" aria-live="assertive"></span>
               </div>
               <div class="form-group">
                 <label for="issue-desc" data-i18n="issue_desc_label">Detailed Description</label>
-                <textarea id="issue-desc" placeholder="Describe the problem in detail..." aria-label="Issue description"></textarea>
+                <textarea id="issue-desc" placeholder="Describe the problem in detail..." aria-label="Issue description" maxlength="1000"></textarea>
               </div>
               <div class="form-group">
-                <label data-i18n="location_label">Location *</label>
+                <label data-i18n="location_label" id="loc-label">Location <abbr title="Required">*</abbr></label>
                 <div class="location-bar">
-                  <input type="text" id="issue-location" placeholder="Address / Landmark..." required aria-label="Issue location" />
-                  <button class="btn btn-outline btn-sm" id="get-location-btn" aria-label="Get current location">📍 <span data-i18n="use_gps">Use GPS</span></button>
+                  <input type="text" id="issue-location" placeholder="Address / Landmark..." required aria-required="true" aria-labelledby="loc-label" aria-describedby="issue-location-error" maxlength="200" />
+                  <button type="button" class="btn btn-outline btn-sm" id="get-location-btn" aria-label="Use GPS to detect current location">📍 <span data-i18n="use_gps">Use GPS</span></button>
                 </div>
+                <span id="issue-location-error" class="field-error" role="alert" aria-live="assertive"></span>
               </div>
               <div class="form-group">
                 <label for="reporter-name" data-i18n="reporter_name">Your Name</label>
-                <input type="text" id="reporter-name" placeholder="Citizen name (optional)" aria-label="Reporter name" />
+                <input type="text" id="reporter-name" placeholder="Citizen name (optional)" aria-label="Your name" maxlength="80" pattern="[A-Za-z\s\u0900-\u097F]+" />
               </div>
               <div class="form-group">
                 <label for="reporter-phone" data-i18n="reporter_phone">Mobile Number</label>
-                <input type="tel" id="reporter-phone" placeholder="10-digit mobile number" pattern="[0-9]{10}" aria-label="Reporter phone number" />
+                <input type="tel" id="reporter-phone" placeholder="10-digit mobile number" pattern="[6-9][0-9]{9}" aria-label="10-digit mobile number" aria-describedby="phone-hint" maxlength="10" />
+                <span id="phone-hint" style="font-size:0.72rem;color:var(--text-muted);">Format: 10 digits starting with 6-9</span>
               </div>
-            </div>
+            </form>
           </div>
         </div>
 
         <div style="display:flex;flex-direction:column;gap:16px;">
           <div class="card">
-            <h2 class="card-title"><span class="card-title-icon">🗺️</span> <span data-i18n="location_map">Location Map</span></h2>
-            <div id="issue-map"></div>
+            <h2 class="card-title"><span class="card-title-icon" aria-hidden="true">🗺️</span> <span data-i18n="location_map">Location Map</span></h2>
+            <div id="issue-map" role="application" aria-label="Map to pin issue location. Click to place marker." style="height:240px;"></div>
             <p style="font-size:0.74rem;color:var(--text-muted);margin-top:8px;" data-i18n="map_note">📍 Click on the map to pin the exact location, or use GPS button above.</p>
           </div>
 
           <div class="card">
-            <h2 class="card-title"><span class="card-title-icon">📷</span> <span data-i18n="upload_photo">Upload Photo / Evidence</span></h2>
-            <label class="file-upload-zone" id="file-upload-zone" for="issue-file" aria-label="Upload issue photo">
+            <h2 class="card-title"><span class="card-title-icon" aria-hidden="true">📷</span> <span data-i18n="upload_photo">Upload Photo / Evidence</span></h2>
+            <label class="file-upload-zone" id="file-upload-zone" for="issue-file">
               <div class="upload-icon" aria-hidden="true">📷</div>
-              <p><strong data-i18n="upload_click">Click to upload</strong> <span data-i18n="or_drag">or drag & drop</span></p>
+              <p><strong data-i18n="upload_click">Click to upload</strong> <span data-i18n="or_drag">or drag &amp; drop</span></p>
               <p style="font-size:0.74rem;margin-top:4px;" data-i18n="upload_types">JPG, PNG or MP4 • Max 10MB</p>
-              <input type="file" id="issue-file" accept="image/*,video/*" aria-label="Upload issue file" />
+              <input type="file" id="issue-file" accept="image/jpeg,image/png,image/webp,video/mp4" aria-label="Upload photo or video evidence of the issue" />
             </label>
-            <div class="ai-analysis-box" id="ai-analysis-box">
+            <div class="ai-analysis-box" id="ai-analysis-box" role="region" aria-live="polite" aria-label="AI analysis results">
               <strong>🤖 AI Analysis:</strong>
               <span id="ai-analysis-text"></span>
             </div>
           </div>
 
-          <button class="btn btn-primary btn-lg" id="submit-issue-btn" style="width:100%;justify-content:center;" aria-label="Submit civic issue report">
+          <button type="button" class="btn btn-primary btn-lg" id="submit-issue-btn" style="width:100%;justify-content:center;" aria-label="Submit civic issue report">
             📤 <span data-i18n="btn_submit">Submit Report</span>
           </button>
         </div>
@@ -435,13 +455,14 @@
         <p class="page-subtitle" data-i18n="tracker_sub">Monitor the status of all your reported civic issues in real-time.</p>
       </div>
 
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:4px;">
-        <input type="text" id="track-search" placeholder="Search by tracking ID or location..." style="flex:1;min-width:220px;padding:10px 14px;border-radius:var(--radius);border:1.5px solid var(--glass-border);background:var(--surface);color:var(--text-primary);font-family:var(--font-sans);font-size:0.88rem;outline:none;" aria-label="Search complaints" />
-        <button class="btn btn-outline" id="track-search-btn" aria-label="Search">🔍 <span data-i18n="search">Search</span></button>
-        <button class="btn btn-sm" id="clear-issues-btn" style="background:var(--surface-alt);color:var(--text-secondary);border:1.5px solid var(--glass-border);" aria-label="Clear all issues">🗑️ Clear All</button>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:4px;" role="search" aria-label="Search complaints">
+        <label for="track-search" class="sr-only">Search complaints</label>
+        <input type="search" id="track-search" placeholder="Search by tracking ID or location..." style="flex:1;min-width:220px;padding:10px 14px;border-radius:var(--radius);border:1.5px solid var(--glass-border);background:var(--surface);color:var(--text-primary);font-family:var(--font-sans);font-size:0.88rem;outline:none;" aria-label="Search complaints by ID or location" maxlength="100" />
+        <button class="btn btn-outline" id="track-search-btn" aria-label="Search complaints">🔍 <span data-i18n="search">Search</span></button>
+        <button class="btn btn-sm" id="clear-issues-btn" style="background:var(--surface-alt);color:var(--text-secondary);border:1.5px solid var(--glass-border);" aria-label="Clear all reported issues">🗑️ Clear All</button>
       </div>
 
-      <div class="tracker-grid" id="tracker-grid" role="region" aria-label="Issue tracker" aria-live="polite">
+      <div class="tracker-grid" id="tracker-grid" role="region" aria-label="Reported issues list" aria-live="polite">
         <!-- Populated by JS -->
       </div>
     </section>
@@ -454,56 +475,56 @@
       </div>
 
       <div class="card">
-        <h2 class="card-title"><span class="card-title-icon">🗂️</span> <span data-i18n="select_service">Select a Government Service</span></h2>
-        <div class="doc-service-tabs" id="doc-tabs" role="tablist" aria-label="Government service tabs">
-          <button class="doc-tab active" data-service="aadhaar" role="tab" aria-selected="true" aria-controls="doc-checklist-panel">🪪 Aadhaar</button>
-          <button class="doc-tab" data-service="passport" role="tab" aria-selected="false">🛂 Passport</button>
-          <button class="doc-tab" data-service="ration" role="tab" aria-selected="false">🛒 Ration Card</button>
-          <button class="doc-tab" data-service="driving" role="tab" aria-selected="false">🚗 Driving License</button>
-          <button class="doc-tab" data-service="birth" role="tab" aria-selected="false">📜 Birth Certificate</button>
-          <button class="doc-tab" data-service="pension" role="tab" aria-selected="false">🏦 Pension / PPF</button>
-          <button class="doc-tab" data-service="income" role="tab" aria-selected="false">💰 Income Certificate</button>
+        <h2 class="card-title"><span class="card-title-icon" aria-hidden="true">🗂️</span> <span data-i18n="select_service">Select a Government Service</span></h2>
+        <div class="doc-service-tabs" id="doc-tabs" role="tablist" aria-label="Government service document guides">
+          <button class="doc-tab active" data-service="aadhaar" role="tab" aria-selected="true" aria-controls="doc-checklist-panel" id="tab-aadhaar">🪪 Aadhaar</button>
+          <button class="doc-tab" data-service="passport" role="tab" aria-selected="false" id="tab-passport">🛂 Passport</button>
+          <button class="doc-tab" data-service="ration" role="tab" aria-selected="false" id="tab-ration">🛒 Ration Card</button>
+          <button class="doc-tab" data-service="driving" role="tab" aria-selected="false" id="tab-driving">🚗 Driving License</button>
+          <button class="doc-tab" data-service="birth" role="tab" aria-selected="false" id="tab-birth">📜 Birth Certificate</button>
+          <button class="doc-tab" data-service="pension" role="tab" aria-selected="false" id="tab-pension">🏦 Pension / PPF</button>
+          <button class="doc-tab" data-service="income" role="tab" aria-selected="false" id="tab-income">💰 Income Certificate</button>
         </div>
       </div>
 
       <div class="two-col">
         <div class="card" role="tabpanel" id="doc-checklist-panel" aria-label="Document checklist">
-          <h2 class="card-title"><span class="card-title-icon">✅</span> <span id="doc-service-label" data-i18n="doc_checklist">Document Checklist</span></h2>
-          <div class="checklist-progress">
+          <h2 class="card-title"><span class="card-title-icon" aria-hidden="true">✅</span> <span id="doc-service-label" data-i18n="doc_checklist">Document Checklist</span></h2>
+          <div class="checklist-progress" role="progressbar" aria-labelledby="checklist-progress-text" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="checklist-progress-region">
             <div class="checklist-progress-bar" id="checklist-bar" style="width:0%"></div>
           </div>
           <p style="font-size:0.76rem;color:var(--text-muted);margin-bottom:14px;" id="checklist-progress-text" data-i18n="checklist_tap">Tap each document to mark as collected.</p>
-          <div class="doc-checklist" id="doc-checklist" role="list">
+          <div class="doc-checklist" id="doc-checklist" role="list" aria-label="Required documents checklist">
             <!-- Populated by JS -->
           </div>
         </div>
 
-        <div class="card" role="region" aria-label="Process guide">
-          <h2 class="card-title"><span class="card-title-icon">🗺️</span> <span data-i18n="how_to_apply">How to Apply</span></h2>
-          <div id="process-steps" style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card" role="region" aria-labelledby="process-heading">
+          <h2 class="card-title" id="process-heading"><span class="card-title-icon" aria-hidden="true">🗺️</span> <span data-i18n="how_to_apply">How to Apply</span></h2>
+          <div id="process-steps" style="display:flex;flex-direction:column;gap:14px;" aria-label="Step by step application process">
             <!-- Populated by JS -->
           </div>
           <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--glass-border);">
             <p style="font-size:0.8rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;" data-i18n="useful_links">🔗 Useful Links</p>
-            <div id="service-links" style="display:flex;flex-direction:column;gap:8px;">
+            <div id="service-links" style="display:flex;flex-direction:column;gap:8px;" aria-label="Official government links">
               <!-- Populated by JS -->
             </div>
           </div>
           <div style="margin-top:16px;">
-            <button class="btn btn-outline" id="ask-bot-docs" style="width:100%;justify-content:center;" aria-label="Ask Seva Sathi about this service">🤖 <span data-i18n="ask_bot">Ask Seva Sathi</span></button>
+            <button class="btn btn-outline" id="ask-bot-docs" style="width:100%;justify-content:center;" aria-label="Ask Seva Sathi AI about this document service">🤖 <span data-i18n="ask_bot">Ask Seva Sathi</span></button>
           </div>
         </div>
       </div>
     </section>
 
-  </main><!-- end #main-content -->
-</div><!-- end #app -->
+  </main>
+</div>
 
 <!-- ── Floating Chat Button ── -->
-<button id="floating-chat-btn" aria-label="Open Seva Sathi chat" title="Talk to Seva Sathi">🤖</button>
+<button id="floating-chat-btn" aria-label="Open Seva Sathi AI chat assistant" title="Talk to Seva Sathi">🤖</button>
 
 <!-- ── Notification Container ── -->
-<div id="notification-container" role="alert" aria-live="polite" style="position:fixed;top:80px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px;"></div>
+<div id="notification-container" role="alert" aria-live="assertive" aria-atomic="true" style="position:fixed;top:80px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px;"></div>
 
 <script src="app.js"></script>
 </body>

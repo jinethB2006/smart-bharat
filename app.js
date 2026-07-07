@@ -1,9 +1,25 @@
 /* ============================================================
    SMART BHARAT – APP.JS
    Core Application Logic
+   Version: 2.0.0 | DEVENGERS PromptWars 2026
    ============================================================ */
 
 'use strict';
+
+// ── Security Constants ─────────────────────────────────────
+/** Maximum allowed input lengths to prevent buffer-overflow attacks */
+const SECURITY = Object.freeze({
+  MAX_QUERY_LENGTH:    1000,
+  MAX_TITLE_LENGTH:    120,
+  MAX_DESC_LENGTH:     1000,
+  MAX_LOCATION_LENGTH: 200,
+  MAX_NAME_LENGTH:     80,
+  MAX_PHONE_LENGTH:    10,
+  MAX_FILE_SIZE_MB:    10,
+  ALLOWED_FILE_TYPES:  ['image/jpeg', 'image/png', 'image/webp', 'video/mp4'],
+  PHONE_REGEX:         /^[6-9][0-9]{9}$/,
+  GEMINI_KEY_REGEX:    /^AIza[A-Za-z0-9_-]{30,}$/,
+});
 
 // ── State ──────────────────────────────────────────────────
 const STATE = {
@@ -16,7 +32,7 @@ const STATE = {
   ttsEnabled: false,
   isRecording: false,
   recognition: null,
-  issues: JSON.parse(localStorage.getItem('sb_issues') || '[]'),
+  issues: safeJSONParse(localStorage.getItem('sb_issues'), []),
   checkedDocs: JSON.parse(localStorage.getItem('sb_docs') || '{}'),
   currentDocService: 'aadhaar',
   mapInstance: null,
@@ -594,14 +610,140 @@ const DOC_DATA = {
 };
 
 // ── Utilities ──────────────────────────────────────────────
+
+/** @param {string} id @returns {HTMLElement|null} */
 function $(id) { return document.getElementById(id); }
+
+/** @param {string} sel @returns {NodeList} */
 function $$(sel) { return document.querySelectorAll(sel); }
-function generateId() { return 'SB' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2,4).toUpperCase(); }
+
+/**
+ * Generates a cryptographically-inspired unique complaint tracking ID.
+ * @returns {string} ID starting with 'SB'
+ */
+function generateId() {
+  return 'SB' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase();
+}
+
+/**
+ * Formats a Unix timestamp into a human-readable time string.
+ * @param {number} ts - Unix timestamp in milliseconds
+ * @returns {string} Time in HH:MM AM/PM format
+ */
 function formatTime(ts) {
   return new Date(ts).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
 }
+
+/**
+ * Formats a Unix timestamp into a human-readable date string.
+ * @param {number} ts - Unix timestamp in milliseconds
+ * @returns {string} Date in D Mon YYYY format
+ */
 function formatDate(ts) {
   return new Date(ts).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+/**
+ * Sanitizes a string to prevent XSS by escaping HTML special characters.
+ * @param {string} str - Raw user input
+ * @returns {string} HTML-escaped string safe for insertion
+ */
+function sanitizeInput(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .trim();
+}
+
+/**
+ * Validates a 10-digit Indian mobile phone number.
+ * Valid numbers start with 6, 7, 8, or 9.
+ * @param {string} phone
+ * @returns {boolean}
+ */
+function validatePhone(phone) {
+  return SECURITY.PHONE_REGEX.test(phone);
+}
+
+/**
+ * Validates that a form field value is not empty.
+ * @param {string} value
+ * @returns {boolean}
+ */
+function validateRequired(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+/**
+ * Validates that an uploaded file is within allowed type and size limits.
+ * @param {File} file - Browser File object
+ * @returns {{ valid: boolean, error: string }}
+ */
+function validateFile(file) {
+  if (!SECURITY.ALLOWED_FILE_TYPES.includes(file.type)) {
+    return { valid: false, error: 'Only JPG, PNG, WebP, and MP4 files are allowed.' };
+  }
+  if (file.size > SECURITY.MAX_FILE_SIZE_MB * 1024 * 1024) {
+    return { valid: false, error: `File must be smaller than ${SECURITY.MAX_FILE_SIZE_MB}MB.` };
+  }
+  if (file.size === 0) {
+    return { valid: false, error: 'File appears to be empty.' };
+  }
+  return { valid: true, error: '' };
+}
+
+/**
+ * Validates an issue report form and shows inline errors.
+ * @param {Object} fields - Form field values
+ * @returns {boolean} True if all required fields are valid
+ */
+function validateIssueForm(fields) {
+  let isValid = true;
+
+  // Clear previous errors
+  ['issue-type-error', 'issue-title-error', 'issue-location-error'].forEach(id => {
+    const el = $(id);
+    if (el) el.textContent = '';
+  });
+
+  if (!validateRequired(fields.type)) {
+    const el = $('issue-type-error');
+    if (el) el.textContent = 'Please select an issue type.';
+    isValid = false;
+  }
+  if (!validateRequired(fields.title)) {
+    const el = $('issue-title-error');
+    if (el) el.textContent = 'Issue title is required.';
+    isValid = false;
+  }
+  if (!validateRequired(fields.loc)) {
+    const el = $('issue-location-error');
+    if (el) el.textContent = 'Please provide a location or use GPS.';
+    isValid = false;
+  }
+  if (fields.phone && !validatePhone(fields.phone)) {
+    showNotification('Phone number must be 10 digits starting with 6-9.', 'warning');
+    isValid = false;
+  }
+  return isValid;
+}
+
+/**
+ * Safely parses JSON, returning a fallback value on error.
+ * @param {string} raw
+ * @param {*} fallback
+ * @returns {*}
+ */
+function safeJSONParse(raw, fallback) {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
 }
 
 // ── Notification System ────────────────────────────────────
@@ -866,6 +1008,10 @@ function simulateAIAnalysis() {
 }
 
 // ── Issue Reporter ─────────────────────────────────────────
+/**
+ * Validates, sanitizes, and submits a civic issue report.
+ * Uses the centralized validateIssueForm() and sanitizeInput() for security.
+ */
 function submitIssue() {
   const type  = $('issue-type').value;
   const title = $('issue-title').value.trim();
@@ -874,38 +1020,46 @@ function submitIssue() {
   const name  = $('reporter-name').value.trim();
   const phone = $('reporter-phone').value.trim();
 
-  if (!type)  { showNotification('Please select issue type.', 'warning'); return; }
-  if (!title) { showNotification('Please provide an issue title.', 'warning'); return; }
-  if (!loc)   { showNotification('Please provide a location.', 'warning'); return; }
+  if (!validateIssueForm({ type, title, loc, phone })) return;
 
   const issue = {
-    id: generateId(),
-    type, title, desc, loc, name, phone,
-    coords: STATE.issueCoords,
+    id:        generateId(),
+    type:      sanitizeInput(type),
+    title:     sanitizeInput(title).substring(0, SECURITY.MAX_TITLE_LENGTH),
+    desc:      sanitizeInput(desc).substring(0, SECURITY.MAX_DESC_LENGTH),
+    loc:       sanitizeInput(loc).substring(0, SECURITY.MAX_LOCATION_LENGTH),
+    name:      sanitizeInput(name).substring(0, SECURITY.MAX_NAME_LENGTH),
+    phone:     phone && validatePhone(phone) ? phone : '',
+    coords:    STATE.issueCoords,
     timestamp: Date.now(),
-    status: 'submitted',
+    status:    'submitted',
     timeline: [
-      { label: 'Issue Submitted', status: 'done', time: Date.now() },
-      { label: 'Under Review', status: 'active', time: null },
+      { label: 'Issue Submitted',        status: 'done',    time: Date.now() },
+      { label: 'Under Review',           status: 'active',  time: null },
       { label: 'Assigned to Department', status: 'pending', time: null },
-      { label: 'Work in Progress', status: 'pending', time: null },
-      { label: 'Resolved', status: 'pending', time: null },
+      { label: 'Work in Progress',       status: 'pending', time: null },
+      { label: 'Resolved',               status: 'pending', time: null },
     ]
   };
 
   STATE.issues.push(issue);
-  localStorage.setItem('sb_issues', JSON.stringify(STATE.issues));
+  try {
+    localStorage.setItem('sb_issues', JSON.stringify(STATE.issues));
+  } catch (e) {
+    console.warn('localStorage write failed:', e);
+  }
 
-  // Reset form
   ['issue-type','issue-title','issue-desc','issue-location','reporter-name','reporter-phone'].forEach(id => $(id).value = '');
+  ['issue-type-error','issue-title-error','issue-location-error'].forEach(id => { const el = $(id); if (el) el.textContent = ''; });
   $('ai-analysis-box').classList.remove('visible');
   if (STATE.mapMarker) { STATE.mapMarker.remove(); STATE.mapMarker = null; }
   STATE.issueCoords = null;
 
-  showNotification(`✅ Issue reported! Tracking ID: ${issue.id}`, 'success', 6000);
+  showNotification(`Issue reported! Tracking ID: ${issue.id}`, 'success', 6000);
   navigateTo('tracker');
   updateIssueCount();
 }
+
 
 // ── Issue Tracker ──────────────────────────────────────────
 function renderTracker(filter = '') {
@@ -1150,19 +1304,21 @@ function init() {
   // Gemini API Key
   $('save-api-key').addEventListener('click', () => {
     const key = $('gemini-api-key').value.trim();
-    if (key && key.startsWith('AIza')) {
+    if (key && SECURITY.GEMINI_KEY_REGEX.test(key)) {
       STATE.geminiKey = key;
-      localStorage.setItem('sb_gemini_key', key);
-      $('api-key-status').textContent = '✅ Key saved – Live AI active!';
+      try { localStorage.setItem('sb_gemini_key', key); } catch(e) { console.warn(e); }
+      $('api-key-status').textContent = 'Key saved – Live AI active!';
       $('api-key-status').style.color = 'var(--success)';
+      $('tts-toggle').setAttribute('aria-pressed', 'false');
       showNotification('Gemini API key saved! Live AI responses enabled.', 'success');
     } else if (key === '') {
       STATE.geminiKey = '';
-      localStorage.removeItem('sb_gemini_key');
-      $('api-key-status').textContent = '🗑️ Key removed';
+      try { localStorage.removeItem('sb_gemini_key'); } catch(e) { console.warn(e); }
+      $('api-key-status').textContent = 'Key removed';
       $('api-key-status').style.color = 'var(--text-muted)';
     } else {
-      showNotification('Invalid API key. Must start with "AIza".', 'error');
+      showNotification('Invalid API key format. Must start with "AIza" and be 30+ chars.', 'error');
+
     }
   });
 

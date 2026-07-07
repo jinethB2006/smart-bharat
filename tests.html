@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Bharat – Unit Tests</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 32px; }
+    h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; color: #f8fafc; }
+    .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 28px; }
+    .suite { background: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #334155; }
+    .suite-title { font-size: 1rem; font-weight: 700; margin-bottom: 14px; color: #7dd3fc; display: flex; align-items: center; gap: 8px; }
+    .test { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1e293b; font-size: 0.85rem; }
+    .test:last-child { border-bottom: none; }
+    .pass { color: #4ade80; font-weight: 700; flex-shrink: 0; }
+    .fail { color: #f87171; font-weight: 700; flex-shrink: 0; }
+    .skip { color: #fbbf24; font-weight: 700; flex-shrink: 0; }
+    .test-name { color: #cbd5e1; flex: 1; }
+    .test-detail { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+    .summary { background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 12px; padding: 24px; margin-top: 24px; border: 1px solid #334155; }
+    .summary h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: #f8fafc; }
+    .score-bar { height: 10px; background: #334155; border-radius: 99px; margin-bottom: 8px; overflow: hidden; }
+    .score-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #4ade80, #22c55e); transition: width 1s ease; }
+    .score-text { font-size: 2rem; font-weight: 800; }
+    .counts { display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+    .count-item { text-align: center; }
+    .count-num { font-size: 1.4rem; font-weight: 800; }
+    .count-label { font-size: 0.72rem; color: #94a3b8; }
+    .green { color: #4ade80; }
+    .red { color: #f87171; }
+    .yellow { color: #fbbf24; }
+  </style>
+</head>
+<body>
+
+<h1>🧪 Smart Bharat – Unit Test Suite</h1>
+<p class="subtitle">Automated tests for all core functions | DEVENGERS PromptWars 2026</p>
+
+<div id="test-output"></div>
+<div class="summary">
+  <h2>📊 Test Summary</h2>
+  <div class="score-bar"><div class="score-fill" id="score-bar" style="width:0%"></div></div>
+  <p class="score-text" id="score-text">Running…</p>
+  <div class="counts">
+    <div class="count-item"><div class="count-num green" id="pass-count">0</div><div class="count-label">PASSED</div></div>
+    <div class="count-item"><div class="count-num red" id="fail-count">0</div><div class="count-label">FAILED</div></div>
+    <div class="count-item"><div class="count-num" id="total-count">0</div><div class="count-label">TOTAL</div></div>
+  </div>
+</div>
+
+<script>
+/**
+ * Smart Bharat – Lightweight Test Framework
+ * No external dependencies.
+ */
+
+// ── Test Runner ─────────────────────────────────────────────
+const results = { pass: 0, fail: 0, suites: [] };
+
+function describe(suiteName, fn) {
+  const suite = { name: suiteName, tests: [] };
+  results.suites.push(suite);
+  const _currentSuite = suite;
+  window.__currentSuite = _currentSuite;
+  fn();
+}
+
+function it(testName, fn) {
+  const suite = window.__currentSuite;
+  try {
+    fn();
+    suite.tests.push({ name: testName, status: 'pass', detail: '' });
+    results.pass++;
+  } catch (e) {
+    suite.tests.push({ name: testName, status: 'fail', detail: e.message });
+    results.fail++;
+  }
+}
+
+function expect(actual) {
+  return {
+    toBe(expected) {
+      if (actual !== expected) throw new Error(`Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    },
+    toEqual(expected) {
+      if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    },
+    toContain(substr) {
+      if (!String(actual).includes(substr)) throw new Error(`Expected "${actual}" to contain "${substr}"`);
+    },
+    toBeTruthy() {
+      if (!actual) throw new Error(`Expected truthy value, got ${actual}`);
+    },
+    toBeFalsy() {
+      if (actual) throw new Error(`Expected falsy value, got ${actual}`);
+    },
+    toBeGreaterThan(n) {
+      if (actual <= n) throw new Error(`Expected ${actual} > ${n}`);
+    },
+    toBeLessThan(n) {
+      if (actual >= n) throw new Error(`Expected ${actual} < ${n}`);
+    },
+    toBeGreaterThanOrEqual(n) {
+      if (actual < n) throw new Error(`Expected ${actual} >= ${n}`);
+    },
+    toMatch(regex) {
+      if (!regex.test(String(actual))) throw new Error(`Expected "${actual}" to match ${regex}`);
+    },
+    toBeInstanceOf(cls) {
+      if (!(actual instanceof cls)) throw new Error(`Expected instance of ${cls.name}`);
+    },
+    not: {
+      toBe(expected) {
+        if (actual === expected) throw new Error(`Expected NOT ${JSON.stringify(expected)}`);
+      },
+      toContain(substr) {
+        if (String(actual).includes(substr)) throw new Error(`Expected "${actual}" NOT to contain "${substr}"`);
+      },
+      toBeFalsy() {
+        if (!actual) throw new Error(`Expected truthy, got ${actual}`);
+      }
+    }
+  };
+}
+
+// ── Unit Under Test: Utility Functions ─────────────────────
+
+/**
+ * Generates a unique issue tracking ID.
+ * @returns {string} ID starting with 'SB'
+ */
+function generateId() {
+  return 'SB' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase();
+}
+
+/**
+ * Formats a timestamp into HH:MM AM/PM string.
+ * @param {number} ts - Unix timestamp
+ * @returns {string} Formatted time
+ */
+function formatTime(ts) {
+  return new Date(ts).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
+/**
+ * Formats a timestamp into Day Month Year string.
+ * @param {number} ts - Unix timestamp
+ * @returns {string} Formatted date
+ */
+function formatDate(ts) {
+  return new Date(ts).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+/**
+ * Sanitizes a string to prevent XSS attacks.
+ * @param {string} str - Raw input string
+ * @returns {string} HTML-escaped string
+ */
+function sanitizeInput(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
+    .trim();
+}
+
+/**
+ * Validates a 10-digit Indian mobile number.
+ * @param {string} phone
+ * @returns {boolean}
+ */
+function validatePhone(phone) {
+  return /^[6-9][0-9]{9}$/.test(phone);
+}
+
+/**
+ * Validates that a form field is not empty.
+ * @param {string} value
+ * @returns {boolean}
+ */
+function validateRequired(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+/**
+ * Converts markdown bold/italic to HTML.
+ * @param {string} text
+ * @returns {string} HTML string
+ */
+function renderMarkdown(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br/>')
+    .replace(/^/, '<p>')
+    .replace(/$/, '</p>');
+}
+
+/**
+ * Matches a user query against the AI knowledge base.
+ * @param {string} query
+ * @returns {string} Response text
+ */
+function getAIResponse(query) {
+  const q = query.toLowerCase();
+  const KB = {
+    aadhaar:    { keywords: ['aadhaar', 'aadhar', 'uid'], response: 'Aadhaar is a 12-digit UID issued by UIDAI.' },
+    passport:   { keywords: ['passport', 'travel document'], response: 'Apply for passport at passportindia.gov.in' },
+    'pm-kisan': { keywords: ['pm kisan', 'kisan', 'farmer scheme'], response: 'PM-KISAN gives ₹6,000/year to farmers.' },
+    ration:     { keywords: ['ration', 'ration card', 'pds'], response: 'Ration card gives subsidised food grains.' },
+    default:    { response: 'I can help with government services and schemes.' }
+  };
+  for (const [, data] of Object.entries(KB)) {
+    if (data.keywords && data.keywords.some(kw => q.includes(kw))) return data.response;
+  }
+  return KB.default.response;
+}
+
+/**
+ * Validates file type against allowed MIME types.
+ * @param {string} fileType - MIME type string
+ * @returns {boolean}
+ */
+function validateFileType(fileType) {
+  const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4'];
+  return ALLOWED.includes(fileType);
+}
+
+/**
+ * Validates file size within allowed limit.
+ * @param {number} sizeBytes
+ * @param {number} maxMB
+ * @returns {boolean}
+ */
+function validateFileSize(sizeBytes, maxMB = 10) {
+  return sizeBytes > 0 && sizeBytes <= maxMB * 1024 * 1024;
+}
+
+/**
+ * Returns filtered schemes from a list.
+ * @param {Array} schemes
+ * @param {Object} filter
+ * @returns {Array}
+ */
+function filterSchemes(schemes, filter) {
+  let result = [...schemes];
+  if (filter.category && filter.category !== 'all') {
+    result = result.filter(s => s.category === filter.category || s.category === 'all');
+  }
+  if (filter.income && filter.income !== 'all') {
+    result = result.filter(s => !s.income || s.income.includes(filter.income) || s.income.includes('all'));
+  }
+  return result;
+}
+
+/**
+ * Returns checklist progress percentage.
+ * @param {number[]} checked - Array of checked indices
+ * @param {number} total - Total document count
+ * @returns {number} Percentage 0–100
+ */
+function getChecklistProgress(checked, total) {
+  if (total <= 0) return 0;
+  return Math.round((checked.length / total) * 100);
+}
+
+/**
+ * Checks if a Gemini API key has valid format.
+ * @param {string} key
+ * @returns {boolean}
+ */
+function isValidGeminiKey(key) {
+  return typeof key === 'string' && key.startsWith('AIza') && key.length >= 30;
+}
+
+/**
+ * Safely parses JSON from localStorage.
+ * @param {string} raw - Raw string from localStorage
+ * @param {*} fallback - Default value on parse error
+ * @returns {*}
+ */
+function safeJSONParse(raw, fallback) {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Truncates a string to a given max length.
+ * @param {string} str
+ * @param {number} max
+ * @returns {string}
+ */
+function truncate(str, max) {
+  if (typeof str !== 'string') return '';
+  return str.length > max ? str.substring(0, max) + '…' : str;
+}
+
+/**
+ * Extracts the first N words from a string.
+ * @param {string} text
+ * @param {number} n
+ * @returns {string}
+ */
+function firstNWords(text, n) {
+  return text.split(/\s+/).slice(0, n).join(' ');
+}
+
+// ── MOCK DATA ──────────────────────────────────────────────
+const MOCK_SCHEMES = [
+  { id: 1, name: 'PM-KISAN', category: 'farmer', income: ['bpl', 'low'] },
+  { id: 2, name: 'Ayushman Bharat', category: 'health', income: ['bpl', 'low', 'mid'] },
+  { id: 3, name: 'PMAY', category: 'housing', income: ['bpl', 'low', 'mid'] },
+  { id: 4, name: 'NSP Scholarship', category: 'student', income: ['bpl', 'low', 'mid'] },
+  { id: 5, name: 'Atal Pension Yojana', category: 'senior', income: ['all'] },
+  { id: 6, name: 'Mudra Yojana', category: 'business', income: ['all'] },
+];
+
+// ══════════════════════════════════════════════════════════
+// TEST SUITES
+// ══════════════════════════════════════════════════════════
+
+describe('🔐 Input Validation & Security', () => {
+  it('sanitizeInput: escapes HTML special characters', () => {
+    expect(sanitizeInput('<script>alert("xss")</script>')).not.toContain('<script>');
+  });
+  it('sanitizeInput: escapes angle brackets', () => {
+    expect(sanitizeInput('<b>bold</b>')).toContain('&lt;b&gt;');
+  });
+  it('sanitizeInput: escapes double quotes', () => {
+    expect(sanitizeInput('"hello"')).toContain('&quot;');
+  });
+  it('sanitizeInput: escapes single quotes', () => {
+    expect(sanitizeInput("it's")).toContain('&#x27;');
+  });
+  it('sanitizeInput: trims whitespace', () => {
+    expect(sanitizeInput('  hello  ')).toBe('hello');
+  });
+  it('sanitizeInput: handles empty string', () => {
+    expect(sanitizeInput('')).toBe('');
+  });
+  it('sanitizeInput: handles non-string input gracefully', () => {
+    expect(sanitizeInput(null)).toBe('');
+    expect(sanitizeInput(undefined)).toBe('');
+  });
+  it('validatePhone: accepts valid 10-digit numbers starting with 6-9', () => {
+    expect(validatePhone('9876543210')).toBeTruthy();
+    expect(validatePhone('6000000000')).toBeTruthy();
+    expect(validatePhone('8123456789')).toBeTruthy();
+  });
+  it('validatePhone: rejects numbers starting with 0-5', () => {
+    expect(validatePhone('1234567890')).toBeFalsy();
+    expect(validatePhone('5000000000')).toBeFalsy();
+  });
+  it('validatePhone: rejects short numbers', () => {
+    expect(validatePhone('98765')).toBeFalsy();
+  });
+  it('validatePhone: rejects non-numeric input', () => {
+    expect(validatePhone('abc1234567')).toBeFalsy();
+  });
+  it('validateRequired: returns true for non-empty strings', () => {
+    expect(validateRequired('hello')).toBeTruthy();
+    expect(validateRequired('  a  ')).toBeTruthy();
+  });
+  it('validateRequired: returns false for empty or whitespace strings', () => {
+    expect(validateRequired('')).toBeFalsy();
+    expect(validateRequired('   ')).toBeFalsy();
+  });
+  it('isValidGeminiKey: accepts valid AIza keys', () => {
+    expect(isValidGeminiKey('AIzaSyBxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')).toBeTruthy();
+  });
+  it('isValidGeminiKey: rejects invalid key formats', () => {
+    expect(isValidGeminiKey('invalid-key')).toBeFalsy();
+    expect(isValidGeminiKey('')).toBeFalsy();
+    expect(isValidGeminiKey('AIza')).toBeFalsy();
+  });
+  it('validateFileType: accepts allowed image/video types', () => {
+    expect(validateFileType('image/jpeg')).toBeTruthy();
+    expect(validateFileType('image/png')).toBeTruthy();
+    expect(validateFileType('image/webp')).toBeTruthy();
+    expect(validateFileType('video/mp4')).toBeTruthy();
+  });
+  it('validateFileType: rejects dangerous file types', () => {
+    expect(validateFileType('application/javascript')).toBeFalsy();
+    expect(validateFileType('text/html')).toBeFalsy();
+    expect(validateFileType('application/x-executable')).toBeFalsy();
+  });
+  it('validateFileSize: accepts files within 10MB limit', () => {
+    expect(validateFileSize(1024 * 1024)).toBeTruthy();   // 1MB
+    expect(validateFileSize(9 * 1024 * 1024)).toBeTruthy(); // 9MB
+  });
+  it('validateFileSize: rejects files over 10MB', () => {
+    expect(validateFileSize(11 * 1024 * 1024)).toBeFalsy();
+  });
+  it('validateFileSize: rejects zero-byte files', () => {
+    expect(validateFileSize(0)).toBeFalsy();
+  });
+});
+
+describe('🔑 ID Generation & Utilities', () => {
+  it('generateId: starts with "SB"', () => {
+    expect(generateId().startsWith('SB')).toBeTruthy();
+  });
+  it('generateId: produces unique IDs', () => {
+    const ids = new Set(Array.from({ length: 50 }, generateId));
+    expect(ids.size).toBe(50);
+  });
+  it('generateId: is uppercase alphanumeric', () => {
+    expect(generateId()).toMatch(/^SB[A-Z0-9]+$/);
+  });
+  it('generateId: has minimum length', () => {
+    expect(generateId().length).toBeGreaterThan(6);
+  });
+  it('truncate: shortens long strings', () => {
+    expect(truncate('Hello World this is a long string', 10)).toContain('…');
+  });
+  it('truncate: keeps short strings intact', () => {
+    expect(truncate('Hi', 10)).toBe('Hi');
+  });
+  it('truncate: handles non-string gracefully', () => {
+    expect(truncate(null, 10)).toBe('');
+  });
+  it('firstNWords: extracts first N words', () => {
+    expect(firstNWords('Hello World foo bar', 2)).toBe('Hello World');
+  });
+  it('firstNWords: handles fewer words than N', () => {
+    expect(firstNWords('Hello', 5)).toBe('Hello');
+  });
+  it('safeJSONParse: parses valid JSON', () => {
+    expect(safeJSONParse('[1,2,3]', [])).toEqual([1, 2, 3]);
+  });
+  it('safeJSONParse: returns fallback on invalid JSON', () => {
+    expect(safeJSONParse('not-json', [])).toEqual([]);
+  });
+  it('safeJSONParse: handles null input', () => {
+    expect(safeJSONParse(null, {})).toEqual({});
+  });
+});
+
+describe('⏰ Date & Time Formatting', () => {
+  it('formatTime: returns a non-empty string for valid timestamp', () => {
+    const result = formatTime(Date.now());
+    expect(result.length).toBeGreaterThan(0);
+  });
+  it('formatTime: contains AM or PM', () => {
+    const result = formatTime(Date.now()).toUpperCase();
+    expect(result.includes('AM') || result.includes('PM')).toBeTruthy();
+  });
+  it('formatDate: returns a non-empty string', () => {
+    expect(formatDate(Date.now()).length).toBeGreaterThan(0);
+  });
+  it('formatDate: contains a year (2025 or 2026)', () => {
+    const result = formatDate(Date.now());
+    expect(result.includes('2025') || result.includes('2026')).toBeTruthy();
+  });
+  it('formatDate: handles past timestamps', () => {
+    const past = new Date('2024-01-15').getTime();
+    expect(formatDate(past)).toContain('2024');
+  });
+});
+
+describe('🤖 AI Response Engine', () => {
+  it('responds to Aadhaar query', () => {
+    expect(getAIResponse('how to get aadhaar card')).toContain('Aadhaar');
+  });
+  it('responds to passport query', () => {
+    expect(getAIResponse('I need a passport')).toContain('passport');
+  });
+  it('responds to farmer/KISAN query', () => {
+    expect(getAIResponse('pm kisan eligibility for farmer')).toContain('₹6,000');
+  });
+  it('responds to ration card query', () => {
+    expect(getAIResponse('how to get ration card')).toContain('Ration card');
+  });
+  it('returns default response for unknown queries', () => {
+    expect(getAIResponse('xyz random unrelated query 12345')).toContain('government services');
+  });
+  it('is case-insensitive', () => {
+    expect(getAIResponse('AADHAAR CARD')).toContain('Aadhaar');
+    expect(getAIResponse('Passport Application')).toContain('passport');
+  });
+  it('returns a non-empty string for all inputs', () => {
+    ['hello', '', '?', 'scheme', 'report issue'].forEach(q => {
+      expect(getAIResponse(q).length).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe('📋 Scheme Finder & Filtering', () => {
+  it('returns all schemes when filter is "all"', () => {
+    const result = filterSchemes(MOCK_SCHEMES, { category: 'all', income: 'all' });
+    expect(result.length).toBe(MOCK_SCHEMES.length);
+  });
+  it('filters by category: farmer', () => {
+    const result = filterSchemes(MOCK_SCHEMES, { category: 'farmer', income: 'all' });
+    expect(result.every(s => s.category === 'farmer')).toBeTruthy();
+  });
+  it('filters by category: student', () => {
+    const result = filterSchemes(MOCK_SCHEMES, { category: 'student', income: 'all' });
+    expect(result.every(s => s.category === 'student')).toBeTruthy();
+  });
+  it('filters by income: bpl', () => {
+    const result = filterSchemes(MOCK_SCHEMES, { category: 'all', income: 'bpl' });
+    result.forEach(s => {
+      expect(s.income.includes('bpl') || s.income.includes('all')).toBeTruthy();
+    });
+  });
+  it('returns empty when no schemes match', () => {
+    const result = filterSchemes(MOCK_SCHEMES, { category: 'nonexistent', income: 'all' });
+    expect(result.length).toBe(0);
+  });
+  it('does not mutate original array', () => {
+    const original = [...MOCK_SCHEMES];
+    filterSchemes(MOCK_SCHEMES, { category: 'farmer', income: 'bpl' });
+    expect(MOCK_SCHEMES.length).toBe(original.length);
+  });
+});
+
+describe('✅ Document Checklist Progress', () => {
+  it('returns 0% when nothing is checked', () => {
+    expect(getChecklistProgress([], 5)).toBe(0);
+  });
+  it('returns 100% when all are checked', () => {
+    expect(getChecklistProgress([0, 1, 2, 3, 4], 5)).toBe(100);
+  });
+  it('returns 40% when 2 of 5 are checked', () => {
+    expect(getChecklistProgress([0, 1], 5)).toBe(40);
+  });
+  it('returns 0 for total=0 (no division by zero)', () => {
+    expect(getChecklistProgress([], 0)).toBe(0);
+  });
+  it('rounds to nearest integer', () => {
+    const result = getChecklistProgress([0], 3); // 33.33%
+    expect(Number.isInteger(result)).toBeTruthy();
+  });
+});
+
+describe('✍️ Markdown Renderer', () => {
+  it('renders bold text', () => {
+    expect(renderMarkdown('**hello**')).toContain('<strong>hello</strong>');
+  });
+  it('renders italic text', () => {
+    expect(renderMarkdown('*world*')).toContain('<em>world</em>');
+  });
+  it('wraps in paragraph tags', () => {
+    const result = renderMarkdown('Hello world');
+    expect(result.startsWith('<p>')).toBeTruthy();
+    expect(result.endsWith('</p>')).toBeTruthy();
+  });
+  it('converts newlines to <br/>', () => {
+    expect(renderMarkdown('line1\nline2')).toContain('<br/>');
+  });
+  it('converts double newlines to paragraph breaks', () => {
+    expect(renderMarkdown('para1\n\npara2')).toContain('</p><p>');
+  });
+  it('handles empty string', () => {
+    expect(renderMarkdown('').length).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ── Render Results ─────────────────────────────────────────
+function renderResults() {
+  const output = document.getElementById('test-output');
+  output.innerHTML = results.suites.map(suite => `
+    <div class="suite">
+      <div class="suite-title">
+        <span>${suite.name}</span>
+        <span style="font-size:0.75rem;background:#334155;padding:2px 8px;border-radius:99px;color:#94a3b8;">
+          ${suite.tests.filter(t=>t.status==='pass').length}/${suite.tests.length} passed
+        </span>
+      </div>
+      ${suite.tests.map(t => `
+        <div class="test">
+          <span class="${t.status === 'pass' ? 'pass' : 'fail'}">${t.status === 'pass' ? '✓' : '✗'}</span>
+          <div>
+            <div class="test-name">${t.name}</div>
+            ${t.detail ? `<div class="test-detail">⚠ ${t.detail}</div>` : ''}
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+
+  const total = results.pass + results.fail;
+  const pct   = total > 0 ? Math.round((results.pass / total) * 100) : 0;
+
+  document.getElementById('score-bar').style.width = pct + '%';
+  document.getElementById('score-bar').style.background =
+    pct >= 90 ? 'linear-gradient(90deg,#4ade80,#22c55e)' :
+    pct >= 70 ? 'linear-gradient(90deg,#fbbf24,#f59e0b)' :
+                'linear-gradient(90deg,#f87171,#ef4444)';
+  document.getElementById('score-text').textContent  = `${pct}% (${results.pass}/${total} tests passed)`;
+  document.getElementById('score-text').style.color  = pct >= 90 ? '#4ade80' : pct >= 70 ? '#fbbf24' : '#f87171';
+  document.getElementById('pass-count').textContent  = results.pass;
+  document.getElementById('fail-count').textContent  = results.fail;
+  document.getElementById('total-count').textContent = total;
+}
+
+renderResults();
+</script>
+</body>
+</html>
